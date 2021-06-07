@@ -9,9 +9,6 @@
 const uint16_t VENDOR_ID = 0x0c45;
 const uint16_t PRODUCT_ID = 0x7401;
 
-//#define VENDOR_ID  0x0c45
-//#define PRODUCT_ID 0x7401
-
 #define INTERFACE1 0x00
 #define INTERFACE2 0x01
 
@@ -20,7 +17,7 @@ const uint16_t PRODUCT_ID = 0x7401;
 const static int reqIntLen=8;
 const static int timeoutMs=5000;
 
-const static char uTemperatura[] = { 0x01, -0x80, 0x33, 0x01, 0x00, 0x00, 0x00, 0x00 };
+const static char uTemperature[] = { 0x01, -0x80, 0x33, 0x01, 0x00, 0x00, 0x00, 0x00 };
 
 const static char uIni1[] = { 0x01, -0x7e, 0x77, 0x01, 0x00, 0x00, 0x00, 0x00 };
 
@@ -50,7 +47,7 @@ Temper::Temper::Temper() {
 
         this->iniControlTransfer();
 
-        this->controlTransfer(uTemperatura);
+        this->controlTransfer(uTemperature);
         this->interruptRead();
 
         this->controlTransfer(uIni1);
@@ -69,8 +66,12 @@ Temper::Temper::~Temper() {
 }
 
 void Temper::Temper::detach() {
-    this->_detach(INTERFACE1);
-    this->_detach(INTERFACE2);
+    try {
+        this->_detach(INTERFACE1);
+        this->_detach(INTERFACE2);
+    } catch (...) {
+        throw;
+    }
 }
 
 void Temper::Temper::_detach(int iInterface) {
@@ -83,7 +84,7 @@ void Temper::Temper::_detach(int iInterface) {
         return;
     }
 
-    // TODO: Error handling
+    throw std::runtime_error{std::string("detach failed: ") + std::strerror(errno)};
     return;
 }
 
@@ -150,7 +151,7 @@ void Temper::Temper::findDevice() {
 
 float Temper::Temper::getTemp() {
     try {
-        this->controlTransfer(uTemperatura);
+        this->controlTransfer(uTemperature);
         return this->interruptReadTemp();
     } catch (...) {
         throw;
