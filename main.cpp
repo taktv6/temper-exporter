@@ -9,14 +9,14 @@
 #include "temper.hpp"
 
 class TempCollector: public virtual prometheus::Collectable {
-    Temper::Temper * temper;
+    Temper::Temper *temper;
 
     public:
-        TempCollector(Temper::Temper * temper);
+        TempCollector(Temper::Temper *temper);
         std::vector<prometheus::MetricFamily> Collect() const override;
 };
 
-TempCollector::TempCollector(Temper::Temper * temper) {
+TempCollector::TempCollector(Temper::Temper *temper) {
     this->temper = temper;
 }
 
