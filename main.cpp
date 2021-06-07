@@ -1,7 +1,6 @@
 #include <gsl/gsl>
 #include <iostream>
 #include <condition_variable>
-#include <unistd.h>
 
 #include <boost/exception/diagnostic_information.hpp> 
 
@@ -12,12 +11,11 @@
 #include "temper.hpp"
 
 class TempCollector: public virtual prometheus::Collectable {
+    Temper::Temper * temper;
+
     public:
         TempCollector(Temper::Temper * temper);
         std::vector<prometheus::MetricFamily> Collect() const override;
-
-    private:
-        Temper::Temper * temper;
 };
 
 TempCollector::TempCollector(Temper::Temper * temper) {
@@ -66,8 +64,7 @@ int main() {
         exposer.RegisterCollectable(temp_col);
 
         block();
-    }
-    catch (const std::runtime_error e) {
+    } catch (const std::runtime_error e) {
         std::clog << "An exception occured: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
