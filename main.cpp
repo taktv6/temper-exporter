@@ -6,35 +6,8 @@
 #include <prometheus/exposer.h>
 #include <prometheus/registry.h>
 
+#include "temp_collector.hpp"
 #include "temper.hpp"
-
-class TempCollector: public virtual prometheus::Collectable {
-    Temper::Temper *temper;
-
-    public:
-        TempCollector(Temper::Temper *temper);
-        std::vector<prometheus::MetricFamily> Collect() const override;
-};
-
-TempCollector::TempCollector(Temper::Temper *temper) {
-    this->temper = temper;
-}
-
-std::vector<prometheus::MetricFamily> TempCollector::Collect() const {
-    return std::vector<prometheus::MetricFamily>{
-        {
-            name: "temper_temperature_celsius",
-            help: "TEMPer1F temperature in celsius",
-            type: prometheus::MetricType::Gauge,
-            metric: std::vector<prometheus::ClientMetric>{
-                {
-                    label: std::vector<prometheus::ClientMetric::Label>{},
-                    gauge: prometheus::ClientMetric::Gauge{(double)(this->temper->getTemp())},
-                }
-            }
-        }
-    };
-}
 
 void block() {
     std::condition_variable exit_cond;
@@ -63,4 +36,3 @@ int main() {
 
     return EXIT_SUCCESS;
 }
-

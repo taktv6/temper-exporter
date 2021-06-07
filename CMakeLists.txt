@@ -8,5 +8,5 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 find_package(Microsoft.GSL CONFIG)
 find_package(prometheus-cpp CONFIG REQUIRED)
 
-add_executable(temper-exporter main.cpp temper.cpp)
+add_executable(temper-exporter main.cpp temper.cpp temp_collector.cpp)
 target_link_libraries(temper-exporter PRIVATE usb Microsoft.GSL::GSL prometheus-cpp::core prometheus-cpp::pull)
