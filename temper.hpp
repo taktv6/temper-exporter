@@ -1,6 +1,7 @@
+#pragma once
+
 #include <usb.h>
 
-#ifndef TEMPER
 namespace Temper {
     class Temper {
             int dev_num;
@@ -20,5 +21,3 @@ namespace Temper {
             float getTemp();
     };  
 }
-#define TEMPER
-#endif
