@@ -2,8 +2,6 @@
 #include <iostream>
 #include <condition_variable>
 
-#include <boost/exception/diagnostic_information.hpp> 
-
 #include <prometheus/counter.h>
 #include <prometheus/exposer.h>
 #include <prometheus/registry.h>
@@ -47,27 +45,21 @@ void block() {
 
 int main() {
     auto registry = std::make_shared<prometheus::Registry>();
+ 
+    prometheus::Exposer exposer{"0.0.0.0:8080, [::]:8080"};
+    exposer.RegisterCollectable(registry);
 
-    try {
-        prometheus::Exposer exposer{"0.0.0.0:8080, [::]:8080"};
-        exposer.RegisterCollectable(registry);
+    Temper::Temper * temper;
+    temper = new Temper::Temper();
 
-        Temper::Temper * temper;
+    auto ___ = gsl::finally([&temper]{
+        delete temper;
+    });
 
-        temper = new Temper::Temper();
+    auto temp_col = std::make_shared<TempCollector>(temper);
+    exposer.RegisterCollectable(temp_col);
 
-        auto ___ = gsl::finally([&temper]{
-            delete temper;
-        });
-
-        auto temp_col = std::make_shared<TempCollector>(temper);
-        exposer.RegisterCollectable(temp_col);
-
-        block();
-    } catch (const std::runtime_error e) {
-        std::clog << "An exception occured: " << e.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+    block();
 
     return EXIT_SUCCESS;
 }
